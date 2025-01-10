@@ -17,4 +17,9 @@
     <string name="marketplace">Marketplace</string>
     <string name="no_modules">Aucun module installé</string>
     <string name="modules_title">Modules</string>
+
+    <!-- Module Status -->
+    <string name="module_installed">Installé</string>
+    <string name="module_available">Disponible</string>
+    <string name="module_disabled">Désactivé</string>
 </resources>
