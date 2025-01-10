@@ -8,7 +8,9 @@ import androidx.navigation.fragment.findNavController
 import com.damolks.ouxy.R
 import com.damolks.ouxy.databinding.FragmentDashboardBinding
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null
