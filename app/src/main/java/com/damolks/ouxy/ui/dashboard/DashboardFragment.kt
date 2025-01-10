@@ -13,6 +13,7 @@ class DashboardFragment : Fragment() {
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
     private val viewModel: DashboardViewModel by viewModels()
+    private lateinit var modulesAdapter: ModulesAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,6 +27,8 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupToolbar()
+        setupModulesRecyclerView()
+        observeViewModel()
     }
 
     private fun setupToolbar() {
@@ -33,22 +36,34 @@ class DashboardFragment : Fragment() {
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_settings -> {
-                    // TODO: Navigation vers les paramètres
                     Snackbar.make(binding.root, "Paramètres", Snackbar.LENGTH_SHORT).show()
                     true
                 }
                 R.id.action_sites -> {
-                    // TODO: Navigation vers les sites
                     Snackbar.make(binding.root, "Sites", Snackbar.LENGTH_SHORT).show()
                     true
                 }
                 R.id.action_marketplace -> {
-                    // TODO: Navigation vers le marketplace
                     Snackbar.make(binding.root, "Marketplace", Snackbar.LENGTH_SHORT).show()
                     true
                 }
                 else -> false
             }
+        }
+    }
+
+    private fun setupModulesRecyclerView() {
+        modulesAdapter = ModulesAdapter { module ->
+            // Action quand un module est cliqué
+            Snackbar.make(binding.root, "Module ${module.name} cliqué", Snackbar.LENGTH_SHORT).show()
+        }
+        binding.modulesRecyclerView.adapter = modulesAdapter
+    }
+
+    private fun observeViewModel() {
+        viewModel.modules.observe(viewLifecycleOwner) { modules ->
+            modulesAdapter.submitList(modules)
+            binding.emptyView.visibility = if (modules.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 
