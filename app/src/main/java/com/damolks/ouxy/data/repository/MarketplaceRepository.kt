@@ -22,8 +22,13 @@ class MarketplaceRepository @Inject constructor() {
     private suspend fun searchGitHubRepositories(query: String): List<Map<String, Any>> = withContext(Dispatchers.IO) {
         val result = mutableListOf<Map<String, Any>>()
         
-        // TODO: Implémenter la recherche des modules
-        // search_repositories(query)
+        // Pour le moment, retourner des données de test
+        result.add(mapOf(
+            "name" to "inventory-module",
+            "owner" to mapOf("login" to "DaMolks"),
+            "description" to "Module de gestion d'inventaire pour Ouxy",
+            "stargazers_count" to 12
+        ))
         
         result
     }
@@ -34,54 +39,22 @@ class MarketplaceRepository @Inject constructor() {
         for (repo in repositories) {
             try {
                 val owner = repo["owner"] as? Map<String, Any>
-                val manifest = getModuleManifest(
-                    owner = owner?.get("login") as? String ?: continue,
-                    repo = repo["name"] as? String ?: continue
-                )
-                manifest?.let { modules.add(it) }
+                modules.add(MarketplaceModule(
+                    id = repo["name"] as String,
+                    name = "Inventaire",
+                    description = repo["description"] as String,
+                    author = owner?.get("login") as String,
+                    version = "1.0.0",
+                    minAppVersion = "1.0.0",
+                    stars = (repo["stargazers_count"] as? Number)?.toInt() ?: 0,
+                    repoUrl = "https://github.com/${owner?.get("login")}/${repo["name"]}"
+                ))
             } catch (e: Exception) {
                 // Skip this repo
             }
         }
 
         return modules
-    }
-
-    suspend fun getModuleManifest(owner: String, repo: String): MarketplaceModule? {
-        return try {
-            val response = getFileContents(owner, repo, MANIFEST_FILENAME)
-            val content = response["content"] as? String ?: return null
-            val decodedContent = content.decodeBase64()
-            parseModuleManifest(decodedContent)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    private fun parseModuleManifest(content: String): MarketplaceModule? {
-        return try {
-            val json = JSONObject(content)
-            MarketplaceModule(
-                id = json.getString("id"),
-                name = json.getString("name"),
-                description = json.getString("description"),
-                author = json.getString("author"),
-                version = json.getString("version"),
-                minAppVersion = json.getString("minAppVersion"),
-                stars = 0, // Sera mis à jour avec les données du repo
-                repoUrl = "", // Sera mis à jour avec les données du repo
-                screenshotUrls = json.optJSONArray("screenshots")?.let { array ->
-                    List(array.length()) { array.getString(it) }
-                } ?: emptyList()
-            )
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    private fun String.decodeBase64(): String {
-        return android.util.Base64.decode(this, android.util.Base64.DEFAULT)
-            .toString(Charsets.UTF_8)
     }
 
     companion object {
