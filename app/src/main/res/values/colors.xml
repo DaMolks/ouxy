@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Couleurs spatiales -->
+    <color name="space_primary">#1A237E</color>
+    <color name="space_primary_dark">#0D1344</color>
+    <color name="space_accent">#7C4DFF</color>
+    <color name="space_accent_dark">#5C35CC</color>
+    <color name="space_background">#0A0E2C</color>
+
+    <!-- Couleurs de base -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 </resources>

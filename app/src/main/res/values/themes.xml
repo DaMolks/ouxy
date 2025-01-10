@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Ouxy" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <!-- Couleurs primaires de l'application -->
+        <item name="colorPrimary">@color/space_primary</item>
+        <item name="colorPrimaryVariant">@color/space_primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+
+        <!-- Couleurs secondaires -->
+        <item name="colorSecondary">@color/space_accent</item>
+        <item name="colorSecondaryVariant">@color/space_accent_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <!-- Statut et barre de navigation -->
+        <item name="android:statusBarColor">@color/space_primary_dark</item>
+        <item name="android:navigationBarColor">@color/space_primary_dark</item>
+
+        <!-- Style global -->
+        <item name="android:windowBackground">@color/space_background</item>
     </style>
 </resources>
