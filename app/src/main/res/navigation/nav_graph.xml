@@ -34,6 +34,15 @@
     <fragment
         android:id="@+id/dashboardFragment"
         android:name="com.damolks.ouxy.ui.dashboard.DashboardFragment"
-        android:label="DashboardFragment" />
+        android:label="DashboardFragment">
+        <action
+            android:id="@+id/action_dashboard_to_marketplace"
+            app:destination="@id/marketplaceFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/marketplaceFragment"
+        android:name="com.damolks.ouxy.ui.marketplace.MarketplaceFragment"
+        android:label="MarketplaceFragment" />
 
 </navigation>
