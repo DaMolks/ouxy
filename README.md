@@ -1,53 +1,53 @@
 # 🌌 OUXY
 
-Your Android Application Universe
+Votre Univers d'Applications Android
 
 [![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge)](LICENSE)
 
-*Expand your application into a constellation of possibilities*
+*Étendez votre application dans une constellation de possibilités*
 
-## 🌟 Core System (The Sun)
+## 🌟 Système Core (Le Soleil)
 
-At the heart of Ouxy lies a powerful core system that acts as the gravitational center of your application universe. It manages:
+Au cœur d'Ouxy se trouve un puissant système core qui agit comme le centre gravitationnel de votre univers applicatif. Il gère :
 
-- 🛸 Dynamic module loading
-- 🌍 Shared resources and data
-- 🌠 Inter-module communication
-- 🌓 Lifecycle management
+- 🛸 Chargement dynamique des modules
+- 🌍 Ressources et données partagées
+- 🌠 Communication inter-modules
+- 🌓 Gestion du cycle de vie
 
-## 🪐 Modules (The Planets)
+## 🪐 Modules (Les Planètes)
 
-Each module in Ouxy is an independent world that:
+Chaque module dans Ouxy est un monde indépendant qui :
 
-- 🌎 Has its own ecosystem
-- 🌏 Maintains its own data
-- 🌍 Follows its own lifecycle
-- 🌋 Can evolve independently
+- 🌎 Possède son propre écosystème
+- 🌏 Maintient ses propres données
+- 🌍 Suit son propre cycle de vie
+- 🌋 Peut évoluer indépendamment
 
-## ☄️ Features
+## ☄️ Fonctionnalités
 
-### Solar System Architecture
-- **Core (The Sun)**: Central system providing energy and resources
-- **Modules (Planets)**: Independent functionalities orbiting the core
-- **Communications (Gravitational Fields)**: Seamless interaction between components
-- **Resources (Stardust)**: Shared assets and utilities
+### Architecture du Système Solaire
+- **Core (Le Soleil)** : Système central fournissant énergie et ressources
+- **Modules (Planètes)** : Fonctionnalités indépendantes en orbite autour du core
+- **Communications (Champs Gravitationnels)** : Interaction fluide entre les composants
+- **Ressources (Poussière d'Étoiles)** : Ressources et utilitaires partagés
 
-### Cosmic Development
-- 🚀 Hot-swappable modules
-- 💫 Real-time development mode
-- 🌌 Runtime module management
-- 🛸 Wireless debugging
+### Développement Cosmique
+- 🚀 Modules interchangeables à chaud
+- 💫 Mode développement en temps réel
+- 🌌 Gestion des modules à l'exécution
+- 🛸 Débogage sans fil
 
-### Universal Tools
-- Development Console: Navigate your application universe
-- Module Workshop: Create new celestial bodies
-- Observatory: Monitor your system
+### Outils Universels
+- Console de Développement : Naviguez dans votre univers applicatif
+- Atelier de Modules : Créez de nouveaux corps célestes
+- Observatoire : Surveillez votre système
 
-## Quick Start
+## Démarrage Rapide
 
-1. Initialize the Core
+1. Initialisation du Core
 ```kotlin
 class App : Application() {
     override fun onCreate() {
@@ -57,41 +57,41 @@ class App : Application() {
 }
 ```
 
-2. Create a Module
+2. Création d'un Module
 ```kotlin
 @OuxyModule
 class MyModule : BaseModule() {
     override fun initialize() {
-        // Your module initialization
+        // Votre initialisation de module
     }
 }
 ```
 
-3. Launch into Orbit
+3. Mise en Orbite
 ```kotlin
 Ouxy.loadModule(MyModule::class.java)
 ```
 
-## 🌍 Development Mode
+## 🌍 Mode Développement
 
-Enter the development constellation:
+Entrez dans la constellation de développement :
 
-1. Enable developer mode in your application
-2. Connect via Android Studio plugin
-3. Navigate through your module universe
-4. Deploy changes at light speed
+1. Activez le mode développeur dans votre application
+2. Connectez-vous via le plugin Android Studio
+3. Naviguez à travers votre univers de modules
+4. Déployez les changements à la vitesse de la lumière
 
-## 🚀 Future Trajectory
+## 🚀 Trajectoire Future
 
-- [ ] Module Marketplace
-- [ ] Advanced Telemetry
-- [ ] Automated Testing Constellations
-- [ ] Enhanced Security Shields
+- [ ] Place de marché des modules
+- [ ] Télémétrie avancée
+- [ ] Constellations de tests automatisés
+- [ ] Boucliers de sécurité améliorés
 
-## License
+## Licence
 
-Ouxy is released under the Apache 2.0 License.
+Ouxy est publié sous licence Apache 2.0.
 
 ---
 
-*Built with ❤️ by Cosmic Developers*
+*Créé avec ❤️ par DaMolks*
