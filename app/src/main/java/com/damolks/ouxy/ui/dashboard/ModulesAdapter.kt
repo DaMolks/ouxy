@@ -2,11 +2,9 @@ package com.damolks.ouxy.ui.dashboard
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.damolks.ouxy.R
 import com.damolks.ouxy.data.model.Module
 import com.damolks.ouxy.databinding.ItemModuleBinding
 
@@ -37,21 +35,6 @@ class ModulesAdapter(
                 moduleTitle.text = module.name
                 moduleDescription.text = module.description
                 moduleIcon.setImageResource(module.iconResId)
-
-                // Configure status chip
-                moduleStatus.apply {
-                    text = when {
-                        !module.isEnabled -> root.context.getString(R.string.module_disabled)
-                        module.isInstalled -> root.context.getString(R.string.module_installed)
-                        else -> root.context.getString(R.string.module_available)
-                    }
-                    setChipBackgroundColorResource(when {
-                        !module.isEnabled -> R.color.status_disabled
-                        module.isInstalled -> R.color.status_installed
-                        else -> R.color.status_available
-                    })
-                }
-
                 root.setOnClickListener { onModuleClick(module) }
             }
         }
