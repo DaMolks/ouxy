@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.damolks.ouxy.R
 import com.damolks.ouxy.databinding.FragmentDashboardBinding
 import com.google.android.material.snackbar.Snackbar
@@ -44,7 +45,7 @@ class DashboardFragment : Fragment() {
                     true
                 }
                 R.id.action_marketplace -> {
-                    Snackbar.make(binding.root, "Marketplace", Snackbar.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_dashboard_to_marketplace)
                     true
                 }
                 else -> false
@@ -54,7 +55,6 @@ class DashboardFragment : Fragment() {
 
     private fun setupModulesRecyclerView() {
         modulesAdapter = ModulesAdapter { module ->
-            // Action quand un module est cliqué
             Snackbar.make(binding.root, "Module ${module.name} cliqué", Snackbar.LENGTH_SHORT).show()
         }
         binding.modulesRecyclerView.adapter = modulesAdapter
