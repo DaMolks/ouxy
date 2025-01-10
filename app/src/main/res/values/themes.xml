@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Ouxy" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.Ouxy" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Couleurs primaires de l'application -->
         <item name="colorPrimary">@color/space_primary</item>
         <item name="colorPrimaryVariant">@color/space_primary_dark</item>
