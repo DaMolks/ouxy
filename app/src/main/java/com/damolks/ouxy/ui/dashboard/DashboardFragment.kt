@@ -63,7 +63,6 @@ class DashboardFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.modules.observe(viewLifecycleOwner) { modules ->
             modulesAdapter.submitList(modules)
-            binding.emptyView.visibility = if (modules.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 
