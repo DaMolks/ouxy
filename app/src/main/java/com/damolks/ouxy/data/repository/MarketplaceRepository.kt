@@ -12,49 +12,80 @@ class MarketplaceRepository @Inject constructor() {
 
     suspend fun searchModules(query: String = "topic:ouxy-module"): List<MarketplaceModule> {
         return try {
-            val response = searchGitHubRepositories(query)
-            parseRepositoriesToModules(response)
+            val searchResult = search_repositories(query)
+            parseRepositoriesToModules(searchResult)
         } catch (e: Exception) {
             emptyList()
         }
     }
 
-    private suspend fun searchGitHubRepositories(query: String): List<Map<String, Any>> = withContext(Dispatchers.IO) {
-        val result = mutableListOf<Map<String, Any>>()
-        
-        // Pour le moment, retourner des données de test
-        result.add(mapOf(
-            "name" to "inventory-module",
-            "owner" to mapOf("login" to "DaMolks"),
-            "description" to "Module de gestion d'inventaire pour Ouxy",
-            "stargazers_count" to 12
-        ))
-        
-        result
-    }
-
-    private suspend fun parseRepositoriesToModules(repositories: List<Map<String, Any>>): List<MarketplaceModule> {
+    private suspend fun parseRepositoriesToModules(searchResult: Map<String, Any>): List<MarketplaceModule> {
         val modules = mutableListOf<MarketplaceModule>()
+        val items = searchResult["items"] as? List<Map<String, Any>> ?: return emptyList()
 
-        for (repo in repositories) {
+        items.forEach { repo ->
             try {
                 val owner = repo["owner"] as? Map<String, Any>
-                modules.add(MarketplaceModule(
-                    id = repo["name"] as String,
-                    name = "Inventaire",
-                    description = repo["description"] as String,
-                    author = owner?.get("login") as String,
-                    version = "1.0.0",
-                    minAppVersion = "1.0.0",
-                    stars = (repo["stargazers_count"] as? Number)?.toInt() ?: 0,
-                    repoUrl = "https://github.com/${owner?.get("login")}/${repo["name"]}"
-                ))
+                val ownerLogin = owner?.get("login") as? String ?: return@forEach
+                val repoName = repo["name"] as? String ?: return@forEach
+
+                // Vérifie si le manifest existe
+                val manifest = getModuleManifest(ownerLogin, repoName)
+                if (manifest != null) {
+                    modules.add(
+                        MarketplaceModule(
+                            id = repoName,
+                            name = manifest.getString("name"),
+                            description = manifest.getString("description"),
+                            author = ownerLogin,
+                            version = manifest.getString("version"),
+                            minAppVersion = manifest.getString("minAppVersion"),
+                            stars = (repo["stargazers_count"] as? Number)?.toInt() ?: 0,
+                            repoUrl = repo["html_url"] as? String ?: "",
+                            screenshotUrls = manifest.optJSONArray("screenshots")?.let { array ->
+                                List(array.length()) { array.getString(it) }
+                            } ?: emptyList()
+                        )
+                    )
+                }
             } catch (e: Exception) {
                 // Skip this repo
             }
         }
 
         return modules
+    }
+
+    private suspend fun getModuleManifest(owner: String, repo: String): JSONObject? {
+        return try {
+            val response = get_file_contents(owner, repo, MANIFEST_FILENAME)
+            val content = response["content"] as? String ?: return null
+            val decodedContent = content.decodeBase64()
+            JSONObject(decodedContent)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private suspend fun search_repositories(query: String) = withContext(Dispatchers.IO) {
+        // Utilise la fonction search_repositories fournie
+        @Suppress("UNCHECKED_CAST")
+        search_repositories(mapOf("query" to query)) as Map<String, Any>
+    }
+
+    private suspend fun get_file_contents(owner: String, repo: String, path: String) = withContext(Dispatchers.IO) {
+        // Utilise la fonction get_file_contents fournie
+        @Suppress("UNCHECKED_CAST")
+        get_file_contents(mapOf(
+            "owner" to owner,
+            "repo" to repo,
+            "path" to path
+        )) as Map<String, Any>
+    }
+
+    private fun String.decodeBase64(): String {
+        return android.util.Base64.decode(this, android.util.Base64.DEFAULT)
+            .toString(Charsets.UTF_8)
     }
 
     companion object {
