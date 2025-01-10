@@ -1,18 +1,12 @@
-<div align="center">
-
 # 🌌 OUXY
 
-### Your Android Application Universe
+Your Android Application Universe
 
 [![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge)](LICENSE)
 
 *Expand your application into a constellation of possibilities*
-
-</div>
-
----
 
 ## 🌟 Core System (The Sun)
 
@@ -47,29 +41,13 @@ Each module in Ouxy is an independent world that:
 - 🛸 Wireless debugging
 
 ### Universal Tools
-- **Development Console**: Navigate your application universe
-- **Module Workshop**: Create new celestial bodies
-- **Observatory**: Monitor your system
+- Development Console: Navigate your application universe
+- Module Workshop: Create new celestial bodies
+- Observatory: Monitor your system
 
-## 🛸 Installation
+## Quick Start
 
-```groovy
-// Root build.gradle
-allprojects {
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
-}
-
-// App build.gradle
-dependencies {
-    implementation 'com.github.DaMolks:ouxy:1.0.0'
-}
-```
-
-## 🌠 Quick Start
-
-1. **Initialize the Core**
+1. Initialize the Core
 ```kotlin
 class App : Application() {
     override fun onCreate() {
@@ -79,7 +57,7 @@ class App : Application() {
 }
 ```
 
-2. **Create a Module**
+2. Create a Module
 ```kotlin
 @OuxyModule
 class MyModule : BaseModule() {
@@ -89,21 +67,9 @@ class MyModule : BaseModule() {
 }
 ```
 
-3. **Launch into Orbit**
+3. Launch into Orbit
 ```kotlin
 Ouxy.loadModule(MyModule::class.java)
-```
-
-## 🌌 Architecture Overview
-
-```
-                      🌟 CORE SYSTEM
-                           |
-        ┌─────────────────┼─────────────────┐
-        │                 │                 │
-    🪐 Module A     🪐 Module B     🪐 Module C
-        │                 │                 │
-   Components        Components        Components
 ```
 
 ## 🌍 Development Mode
@@ -122,22 +88,10 @@ Enter the development constellation:
 - [ ] Automated Testing Constellations
 - [ ] Enhanced Security Shields
 
-## 🌟 Contributing
+## License
 
-Join our universe of contributors! Check out our [Contributing Guidelines](CONTRIBUTING.md).
-
-## 📡 Support
-
-Need help navigating the cosmos? Check our [Documentation](docs/README.md) or open an [Issue](../../issues).
-
-## 🌌 License
-
-Ouxy is released under the [Apache 2.0 License](LICENSE).
+Ouxy is released under the Apache 2.0 License.
 
 ---
 
-<div align="center">
-
 *Built with ❤️ by Cosmic Developers*
-
-</div>
