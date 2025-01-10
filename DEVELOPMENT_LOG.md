@@ -20,12 +20,14 @@
 ### 17:15 - ÉTAPE 2 - Architecture MVVM et Navigation
 - ✅ Ajout des dépendances (Navigation, ViewModel, Room)
 - ✅ Configuration du graphe de navigation
-- ✅ Structure de navigation mise en place :
-  * SplashFragment -> Vérification profil technicien
-  * TechnicianSetupFragment -> Configuration initiale
-  * DashboardFragment -> Écran principal
+- ✅ Structure de navigation mise en place
+
+### 17:30 - Implémentation du Splash Screen
+- ✅ Création SplashFragment et ViewModel
+- ✅ Layout du splash screen avec animation basique
+- ✅ Logique de vérification du profil (mock)
 
 Prochaines actions :
-1. Création des Fragments
-2. Implémentation des ViewModels
-3. Configuration de Room
+1. Implémentation TechnicianSetupFragment
+2. Création de l'entité Technicien avec Room
+3. Implémentation DashboardFragment
