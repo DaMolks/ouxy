@@ -16,34 +16,14 @@ class DashboardViewModel : ViewModel() {
     }
 
     private fun loadModules() {
-        // Modules de test
-        val testModules = listOf(
+        val installedModules = listOf(
             Module(
                 id = "reports",
                 name = "Rapports",
                 description = "Création et gestion des rapports d'intervention",
-                version = "1.0",
-                iconResId = R.drawable.ic_module_reports,
-                isInstalled = true
-            ),
-            Module(
-                id = "planning",
-                name = "Planning",
-                description = "Gestion des rendez-vous et interventions",
-                version = "1.0",
-                iconResId = R.drawable.ic_module_planning,
-                isInstalled = false
-            ),
-            Module(
-                id = "inventory",
-                name = "Inventaire",
-                description = "Gestion du matériel et des pièces",
-                version = "1.0",
-                iconResId = R.drawable.ic_module_inventory,
-                isInstalled = false,
-                isEnabled = false
+                iconResId = R.drawable.ic_module_reports
             )
         )
-        _modules.value = testModules
+        _modules.value = installedModules
     }
 }
