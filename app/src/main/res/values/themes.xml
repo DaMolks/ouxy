@@ -3,7 +3,7 @@
     <style name="Theme.Ouxy" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Couleurs primaires de l'application -->
         <item name="colorPrimary">@color/space_primary</item>
-        <item name="colorPrimaryVariant">@color/space_primary_dark</item>
+        <item name="colorPrimaryVariant">@color/space_primary</item>
         <item name="colorOnPrimary">@color/white</item>
 
         <!-- Couleurs secondaires -->
@@ -12,8 +12,11 @@
         <item name="colorOnSecondary">@color/white</item>
 
         <!-- Statut et barre de navigation -->
-        <item name="android:statusBarColor">@color/space_primary_dark</item>
-        <item name="android:navigationBarColor">@color/space_primary_dark</item>
+        <item name="android:statusBarColor">@color/space_primary</item>
+        <item name="android:navigationBarColor">@color/space_primary</item>
+
+        <!-- Icônes de la barre de statut en blanc -->
+        <item name="android:windowLightStatusBar">false</item>
 
         <!-- Style global -->
         <item name="android:windowBackground">@color/space_background</item>
