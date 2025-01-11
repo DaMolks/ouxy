@@ -1,13 +1,1 @@
-package com.damolks.ouxy.data.model
-
-data class MarketplaceModule(
-    val id: String,
-    val name: String,
-    val description: String,
-    val author: String,
-    val version: String,
-    val minAppVersion: String,
-    val stars: Int,
-    val repoUrl: String,
-    val screenshotUrls: List<String>
-)
+cGFja2FnZSBjb20uZGFtb2xrcy5vdXh5LmRhdGEubW9kZWwKCmRhdGEgY2xhc3MgTWFya2V0cGxhY2VNb2R1bGUoCiAgICB2YWwgaWQ6IFN0cmluZywKICAgIHZhbCBuYW1lOiBTdHJpbmcsCiAgICB2YWwgZGVzY3JpcHRpb246IFN0cmluZywKICAgIHZhbCBhdXRob3I6IFN0cmluZywKICAgIHZhbCB2ZXJzaW9uOiBTdHJpbmcsCiAgICB2YWwgbWluQXBwVmVyc2lvbjogU3RyaW5nLAogICAgdmFsIHN0YXJzOiBJbnQsCiAgICB2YWwgcmVwb1VybDogU3RyaW5nLAogICAgdmFsIHNjcmVlbnNob3RVcmxzOiBMaXN0PFN0cmluZz4KKQ==
