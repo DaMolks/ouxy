@@ -9,10 +9,10 @@
         android:name="com.damolks.ouxy.ui.splash.SplashFragment"
         android:label="SplashFragment">
         <action
-            android:id="@+id/action_splashFragment_to_technicianSetupFragment"
+            android:id="@+id/actionSplashToTechnicianSetup"
             app:destination="@id/technicianSetupFragment" />
         <action
-            android:id="@+id/action_splashFragment_to_dashboardFragment"
+            android:id="@+id/actionSplashToDashboard"
             app:destination="@id/dashboardFragment" />
     </fragment>
 
@@ -21,7 +21,7 @@
         android:name="com.damolks.ouxy.ui.technician.TechnicianSetupFragment"
         android:label="TechnicianSetupFragment">
         <action
-            android:id="@+id/action_technicianSetupFragment_to_dashboardFragment"
+            android:id="@+id/actionTechnicianSetupToDashboard"
             app:destination="@id/dashboardFragment" />
     </fragment>
 
@@ -30,7 +30,7 @@
         android:name="com.damolks.ouxy.ui.dashboard.DashboardFragment"
         android:label="DashboardFragment">
         <action
-            android:id="@+id/action_dashboardFragment_to_marketplaceFragment"
+            android:id="@+id/actionDashboardToMarketplace"
             app:destination="@id/marketplaceFragment" />
     </fragment>
 
