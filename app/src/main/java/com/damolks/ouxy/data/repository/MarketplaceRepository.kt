@@ -7,6 +7,10 @@ import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// Déclarations externes des fonctions GitHub
+external fun search_repositories(params: Map<String, String>): Map<String, Any>
+external fun get_file_contents(params: Map<String, String>): Map<String, Any>
+
 @Singleton
 class MarketplaceRepository @Inject constructor() {
 
