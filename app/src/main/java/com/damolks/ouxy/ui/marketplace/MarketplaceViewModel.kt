@@ -43,8 +43,9 @@ class MarketplaceViewModel @Inject constructor(
         }
     }
 
-    fun onModuleSelected(module: MarketplaceModule) {
-        // TODO: Navigation vers les détails du module
+    // TODO: Implement module selection handling
+    fun onModuleSelected(@Suppress("UNUSED_PARAMETER") module: MarketplaceModule) {
+        // Will be implemented later
     }
 
     fun refreshModules() {
