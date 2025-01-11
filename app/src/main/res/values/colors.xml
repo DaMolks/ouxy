@@ -9,7 +9,8 @@
     <color name="space_primary_variant">#005CB2</color>
     <color name="space_accent">#00B8D4</color>
     <color name="space_accent_dark">#0088A3</color>
-    <color name="space_background">#F5F5F5</color>
+    <color name="space_background">#121212</color>
+    <color name="space_surface">#1E1E1E</color>
     
     <!-- Module states -->
     <color name="moduleInstalled">#00C853</color>
@@ -17,6 +18,6 @@
     
     <!-- Generic colors -->
     <color name="starColor">#FFC107</color>
-    <color name="textLight">#757575</color>
-    <color name="textDark">#212121</color>
+    <color name="textLight">#BDBDBD</color>
+    <color name="textDark">#E0E0E0</color>
 </resources>
