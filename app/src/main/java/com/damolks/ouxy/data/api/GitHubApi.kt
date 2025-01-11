@@ -1,8 +1,6 @@
 package com.damolks.ouxy.data.api
 
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface GitHubApi {
     @GET("search/repositories")
@@ -14,4 +12,8 @@ interface GitHubApi {
         @Path("repo") repo: String,
         @Path("path") path: String
     ): Map<String, Any>
+    
+    @GET
+    @Streaming
+    suspend fun downloadFile(@Url url: String): okhttp3.ResponseBody
 }
