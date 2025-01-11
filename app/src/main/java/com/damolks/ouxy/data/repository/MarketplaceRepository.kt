@@ -12,11 +12,17 @@ class MarketplaceRepository @Inject constructor() {
 
     suspend fun searchModules(query: String = "topic:ouxy-module"): List<MarketplaceModule> {
         return try {
-            val searchResult = search_repositories(query)
+            val searchResult = searchGitHubRepositories(query)
             parseRepositoriesToModules(searchResult)
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    private suspend fun searchGitHubRepositories(query: String): Map<String, Any> = withContext(Dispatchers.IO) {
+        val params = mapOf("query" to query)
+        @Suppress("UNCHECKED_CAST")
+        search_repositories(params) as Map<String, Any>
     }
 
     private suspend fun parseRepositoriesToModules(searchResult: Map<String, Any>): List<MarketplaceModule> {
@@ -58,7 +64,7 @@ class MarketplaceRepository @Inject constructor() {
 
     private suspend fun getModuleManifest(owner: String, repo: String): JSONObject? {
         return try {
-            val response = get_file_contents(owner, repo, MANIFEST_FILENAME)
+            val response = getFileContents(owner, repo, MANIFEST_FILENAME)
             val content = response["content"] as? String ?: return null
             val decodedContent = content.decodeBase64()
             JSONObject(decodedContent)
@@ -67,20 +73,14 @@ class MarketplaceRepository @Inject constructor() {
         }
     }
 
-    private suspend fun search_repositories(query: String) = withContext(Dispatchers.IO) {
-        // Utilise la fonction search_repositories fournie
-        @Suppress("UNCHECKED_CAST")
-        search_repositories(mapOf("query" to query)) as Map<String, Any>
-    }
-
-    private suspend fun get_file_contents(owner: String, repo: String, path: String) = withContext(Dispatchers.IO) {
-        // Utilise la fonction get_file_contents fournie
-        @Suppress("UNCHECKED_CAST")
-        get_file_contents(mapOf(
+    private suspend fun getFileContents(owner: String, repo: String, path: String): Map<String, Any> = withContext(Dispatchers.IO) {
+        val params = mapOf(
             "owner" to owner,
             "repo" to repo,
             "path" to path
-        )) as Map<String, Any>
+        )
+        @Suppress("UNCHECKED_CAST")
+        get_file_contents(params) as Map<String, Any>
     }
 
     private fun String.decodeBase64(): String {
