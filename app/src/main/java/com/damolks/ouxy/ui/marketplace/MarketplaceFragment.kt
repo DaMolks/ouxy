@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.damolks.ouxy.R
 import com.damolks.ouxy.databinding.FragmentMarketplaceBinding
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 
 @AndroidEntryPoint
 class MarketplaceFragment : Fragment() {
@@ -35,12 +38,12 @@ class MarketplaceFragment : Fragment() {
 
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
-            requireActivity().onBackPressed()
+            findNavController().navigateUp()
         }
         
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
-                com.damolks.ouxy.R.id.action_refresh -> {
+                R.id.action_refresh -> {
                     viewModel.refreshModules()
                     true
                 }
@@ -50,8 +53,12 @@ class MarketplaceFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        modulesAdapter = MarketplaceModulesAdapter { module ->
-            viewModel.onModuleSelected(module)
+        modulesAdapter = MarketplaceModulesAdapter { module, isInstalled ->
+            if (isInstalled) {
+                viewModel.uninstallModule(module)
+            } else {
+                viewModel.installModule(module)
+            }
         }
         binding.recyclerView.adapter = modulesAdapter
     }
@@ -70,6 +77,13 @@ class MarketplaceFragment : Fragment() {
         viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
             errorMessage?.let {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
+            }
+        }
+
+        // Observer les états d'installation
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.moduleInstallStates.collectLatest { states ->
+                modulesAdapter.updateInstallStates(states)
             }
         }
     }
