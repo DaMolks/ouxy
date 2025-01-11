@@ -28,11 +28,12 @@ class MarketplaceRepository @Inject constructor(
 
     private suspend fun parseRepositoriesToModules(searchResult: Map<String, Any>): List<MarketplaceModule> {
         val modules = mutableListOf<MarketplaceModule>()
-        val items = searchResult["items"] as? List<Map<String, Any>> ?: return emptyList()
+        @Suppress("UNCHECKED_CAST")
+        val items = (searchResult["items"] as? List<*>)?.filterIsInstance<Map<String, Any>>() ?: return emptyList()
 
         items.forEach { repo ->
             try {
-                val owner = repo["owner"] as? Map<String, Any>
+                val owner = repo["owner"] as? Map<*, *>
                 val ownerLogin = owner?.get("login") as? String ?: return@forEach
                 val repoName = repo["name"] as? String ?: return@forEach
 

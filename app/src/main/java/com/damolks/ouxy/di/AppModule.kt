@@ -1,5 +1,6 @@
 package com.damolks.ouxy.di
 
+import com.damolks.ouxy.data.api.GitHubApi
 import com.damolks.ouxy.data.repository.MarketplaceRepository
 import dagger.Module
 import dagger.Provides
@@ -13,7 +14,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideMarketplaceRepository(): MarketplaceRepository {
-        return MarketplaceRepository()
+    fun provideMarketplaceRepository(gitHubApi: GitHubApi): MarketplaceRepository {
+        return MarketplaceRepository(gitHubApi)
     }
 }
