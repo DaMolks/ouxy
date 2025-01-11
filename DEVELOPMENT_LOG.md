@@ -65,3 +65,28 @@ Prochaines étapes pour demain :
 - Navigation entre écrans opérationnelle
 - Structure Marketplace en place
 - Base pour les modules établie
+
+## 11 Janvier 2025 - Développement du Repository et Gestion des Modules
+
+### 10:30 - Correction du MarketplaceRepository
+- 🔧 Résolution des problèmes de type dans la récupération des données GitHub
+- ✅ Refactoring du code pour améliorer la robustesse
+- ✅ Mise en place d'interfaces pour la gestion des services GitHub
+- ⏳ Tests d'intégration à réaliser
+
+### 14:15 - Amélioration de la Gestion des Modules
+- ✅ Mise en place d'un système de validation des manifests de modules
+- 🔧 Correction des mécanismes de décodage Base64
+- ✅ Ajout de gestion des erreurs plus fine
+- ⏳ Implémentation des vérifications de compatibilité
+
+Prochaines étapes :
+1. Finaliser les tests du MarketplaceRepository
+2. Implémenter la vue détaillée des modules
+3. Développer le système de téléchargement et d'installation des modules
+4. Ajouter des validations supplémentaires pour les manifests
+
+État actuel :
+- Système de récupération des modules GitHub opérationnel
+- Gestion des erreurs améliorée
+- Base pour l'installation de modules en place
