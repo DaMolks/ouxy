@@ -1,7 +1,6 @@
 package com.damolks.ouxy.di
 
 import com.damolks.ouxy.data.api.GitHubApi
-import com.damolks.ouxy.data.api.MockGitHubApi
 import com.damolks.ouxy.data.repository.MarketplaceRepository
 import dagger.Module
 import dagger.Provides
@@ -12,11 +11,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Provides
-    @Singleton
-    fun provideGitHubApi(): GitHubApi = MockGitHubApi()
-
     @Provides
     @Singleton
     fun provideMarketplaceRepository(gitHubApi: GitHubApi): MarketplaceRepository {
