@@ -65,7 +65,7 @@ class MarketplaceModulesAdapter(
                     when {
                         isInstalling -> R.color.moduleInstalling
                         isInstalled -> R.color.moduleInstalled
-                        else -> R.color.colorPrimary
+                        else -> R.color.space_primary
                     }
                 )
 
