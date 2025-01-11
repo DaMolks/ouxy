@@ -47,7 +47,7 @@ class DashboardFragment : Fragment() {
                     true
                 }
                 R.id.action_marketplace -> {
-                    findNavController().navigate(R.id.action_dashboard_to_marketplace)
+                    findNavController().navigate(DashboardFragmentDirections.actionDashboardToMarketplace())
                     true
                 }
                 else -> false
