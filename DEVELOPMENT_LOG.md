@@ -80,6 +80,13 @@ Prochaines étapes pour demain :
 - ✅ Ajout de gestion des erreurs plus fine
 - ⏳ Implémentation des vérifications de compatibilité
 
+### 15:30 - Mise en place de l'API GitHub et Configuration Réseau
+- ✅ Ajout des dépendances Retrofit et OkHttp
+- ✅ Création de l'interface GitHubApi
+- ✅ Configuration du NetworkModule pour Hilt
+- ✅ Ajout de la permission INTERNET
+- 🔧 Correction des IDs de navigation pour correspondre au code existant
+
 Prochaines étapes :
 1. Finaliser les tests du MarketplaceRepository
 2. Implémenter la vue détaillée des modules
@@ -90,3 +97,4 @@ Prochaines étapes :
 - Système de récupération des modules GitHub opérationnel
 - Gestion des erreurs améliorée
 - Base pour l'installation de modules en place
+- Navigation fonctionnelle
