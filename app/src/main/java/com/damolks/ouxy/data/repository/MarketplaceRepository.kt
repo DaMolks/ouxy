@@ -1,5 +1,6 @@
 package com.damolks.ouxy.data.repository
 
+import com.damolks.ouxy.data.api.GitHubApi
 import com.damolks.ouxy.data.model.MarketplaceModule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -7,12 +8,10 @@ import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
 
-// Déclarations externes des fonctions GitHub
-external fun search_repositories(params: Map<String, String>): Map<String, Any>
-external fun get_file_contents(params: Map<String, String>): Map<String, Any>
-
 @Singleton
-class MarketplaceRepository @Inject constructor() {
+class MarketplaceRepository @Inject constructor(
+    private val gitHubApi: GitHubApi
+) {
 
     suspend fun searchModules(query: String = "topic:ouxy-module"): List<MarketplaceModule> {
         return try {
@@ -24,9 +23,7 @@ class MarketplaceRepository @Inject constructor() {
     }
 
     private suspend fun searchGitHubRepositories(query: String): Map<String, Any> = withContext(Dispatchers.IO) {
-        val params = mapOf("query" to query)
-        @Suppress("UNCHECKED_CAST")
-        search_repositories(params) as Map<String, Any>
+        gitHubApi.searchRepositories(query)
     }
 
     private suspend fun parseRepositoriesToModules(searchResult: Map<String, Any>): List<MarketplaceModule> {
@@ -68,23 +65,13 @@ class MarketplaceRepository @Inject constructor() {
 
     private suspend fun getModuleManifest(owner: String, repo: String): JSONObject? {
         return try {
-            val response = getFileContents(owner, repo, MANIFEST_FILENAME)
+            val response = gitHubApi.getFileContents(owner, repo, MANIFEST_FILENAME)
             val content = response["content"] as? String ?: return null
             val decodedContent = content.decodeBase64()
             JSONObject(decodedContent)
         } catch (e: Exception) {
             null
         }
-    }
-
-    private suspend fun getFileContents(owner: String, repo: String, path: String): Map<String, Any> = withContext(Dispatchers.IO) {
-        val params = mapOf(
-            "owner" to owner,
-            "repo" to repo,
-            "path" to path
-        )
-        @Suppress("UNCHECKED_CAST")
-        get_file_contents(params) as Map<String, Any>
     }
 
     private fun String.decodeBase64(): String {
