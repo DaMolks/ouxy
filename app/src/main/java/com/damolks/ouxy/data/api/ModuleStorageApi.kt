@@ -3,13 +3,9 @@ package com.damolks.ouxy.data.api
 import android.content.Context
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-/**
- * Implémentation de StorageApi utilisant DataStore pour stocker les données des modules.
- */
 class ModuleStorageApi @Inject constructor(
     @ApplicationContext private val context: Context,
     private val moduleId: String
@@ -24,9 +20,9 @@ class ModuleStorageApi @Inject constructor(
                 is Int -> preferences[intPreferencesKey(key)] = value
                 is Long -> preferences[longPreferencesKey(key)] = value
                 is Float -> preferences[floatPreferencesKey(key)] = value
-                is Double -> preferences[doublePreferencesKey(key)] = value
+                is Double -> preferences[doublePreferencesKey(key)] = value.toFloat()
                 is Boolean -> preferences[booleanPreferencesKey(key)] = value
-                else -> throw IllegalArgumentException("Type non supporté: ${value?.javaClass}")
+                else -> throw IllegalArgumentException("Type non supporté: ${value?.javaClass?.simpleName}")
             }
         }
     }
@@ -39,7 +35,7 @@ class ModuleStorageApi @Inject constructor(
             is Int -> preferences[intPreferencesKey(key)] as? T ?: defaultValue
             is Long -> preferences[longPreferencesKey(key)] as? T ?: defaultValue
             is Float -> preferences[floatPreferencesKey(key)] as? T ?: defaultValue
-            is Double -> preferences[doublePreferencesKey(key)] as? T ?: defaultValue
+            is Double -> (preferences[floatPreferencesKey(key)]?.toDouble()) as? T ?: defaultValue
             is Boolean -> preferences[booleanPreferencesKey(key)] as? T ?: defaultValue
             else -> defaultValue
         }
@@ -51,7 +47,6 @@ class ModuleStorageApi @Inject constructor(
             preferences.remove(intPreferencesKey(key))
             preferences.remove(longPreferencesKey(key))
             preferences.remove(floatPreferencesKey(key))
-            preferences.remove(doublePreferencesKey(key))
             preferences.remove(booleanPreferencesKey(key))
         }
     }
