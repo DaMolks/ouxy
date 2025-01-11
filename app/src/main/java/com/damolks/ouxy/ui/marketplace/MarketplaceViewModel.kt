@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.damolks.ouxy.data.model.MarketplaceModule
 import com.damolks.ouxy.data.repository.MarketplaceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,16 +30,20 @@ class MarketplaceViewModel @Inject constructor(
     }
 
     fun loadModules() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                _loading.value = true
+                _loading.postValue(true)
                 val modules = marketplaceRepository.searchModules()
-                _marketplaceModules.value = modules
-                _error.value = null
+                _marketplaceModules.postValue(modules)
+                if (modules.isEmpty()) {
+                    _error.postValue("Aucun module trouvé. Vérifiez que vos repos ont le tag 'ouxy-module'")
+                } else {
+                    _error.postValue(null)
+                }
             } catch (e: Exception) {
-                _error.value = e.message
+                _error.postValue("Erreur: ${e.message}")
             } finally {
-                _loading.value = false
+                _loading.postValue(false)
             }
         }
     }
