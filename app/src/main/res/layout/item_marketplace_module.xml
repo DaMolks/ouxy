@@ -12,69 +12,107 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/moduleName"
+        <View
+            android:id="@+id/statusBar"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/stars"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Inventaire" />
-
-        <TextView
-            android:id="@+id/stars"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_star"
-            android:drawablePadding="4dp"
+            android:padding="16dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/moduleName"
-            tools:text="12" />
+            app:layout_constraintStart_toEndOf="@id/statusBar"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/moduleDescription"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:maxLines="2"
-            android:ellipsize="end"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/moduleName"
-            tools:text="Module de gestion d'inventaire pour Ouxy" />
+            <TextView
+                android:id="@+id/moduleName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textDark"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/stars"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Inventaire" />
 
-        <TextView
-            android:id="@+id/moduleAuthor"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textStyle="italic"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/moduleDescription"
-            tools:text="Par DaMolks" />
+            <TextView
+                android:id="@+id/stars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@android:drawable/btn_star_big_on"
+                android:drawablePadding="4dp"
+                android:textColor="@color/starColor"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/moduleName"
+                tools:text="12" />
 
-        <TextView
-            android:id="@+id/moduleVersion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="italic"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/moduleAuthor"
-            tools:text="v1.0.0" />
+            <TextView
+                android:id="@+id/moduleDescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/textDark"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/moduleName"
+                tools:text="Module de gestion d'inventaire pour Ouxy" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/installButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/install"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/moduleVersion" />
+            <TextView
+                android:id="@+id/moduleAuthor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/textLight"
+                android:textStyle="italic"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/moduleDescription"
+                tools:text="Par DaMolks" />
+
+            <TextView
+                android:id="@+id/moduleVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/textLight"
+                android:textStyle="italic"
+                app:layout_constraintBottom_toBottomOf="@id/moduleAuthor"
+                app:layout_constraintStart_toEndOf="@id/moduleAuthor"
+                app:layout_constraintTop_toTopOf="@id/moduleAuthor"
+                tools:text="v1.0.0" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/installButton"
+                style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/install"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/moduleVersion" />
+
+            <ProgressBar
+                android:id="@+id/progressIndicator"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/installButton"
+                app:layout_constraintEnd_toStartOf="@id/installButton"
+                app:layout_constraintTop_toTopOf="@id/installButton"
+                tools:visibility="visible" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
