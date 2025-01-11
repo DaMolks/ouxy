@@ -1,38 +1,22 @@
 package com.damolks.ouxy.ui.technician
 
-import android.app.Application
-import androidx.lifecycle.*
-import com.damolks.ouxy.OuxyApplication
-import com.damolks.ouxy.data.model.Technician
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TechnicianSetupViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val technicianDao = (application as OuxyApplication).database.technicianDao()
-
+@HiltViewModel
+class TechnicianSetupViewModel @Inject constructor() : ViewModel() {
     private val _navigateToHome = MutableLiveData<Boolean>()
     val navigateToHome: LiveData<Boolean> = _navigateToHome
 
     fun saveTechnician(firstName: String, lastName: String, sector: String, identifier: String, supervisor: String?) {
-        if(validateInput(firstName, lastName, sector, identifier)) {
-            viewModelScope.launch {
-                val technician = Technician(
-                    firstName = firstName.trim(),
-                    lastName = lastName.trim(),
-                    sector = sector.trim(),
-                    identifier = identifier.trim(),
-                    supervisor = supervisor?.trim()
-                )
-                technicianDao.insertTechnician(technician)
-                _navigateToHome.value = true
-            }
+        viewModelScope.launch {
+            // TODO: Save to Room
+            _navigateToHome.value = true
         }
-    }
-
-    private fun validateInput(firstName: String, lastName: String, sector: String, identifier: String): Boolean {
-        return firstName.isNotBlank() && 
-               lastName.isNotBlank() && 
-               sector.isNotBlank() && 
-               identifier.isNotBlank()
     }
 }

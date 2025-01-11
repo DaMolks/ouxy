@@ -1,6 +1,9 @@
 package com.damolks.ouxy.ui.marketplace
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.damolks.ouxy.data.model.MarketplaceModule
 import com.damolks.ouxy.data.repository.MarketplaceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,8 +24,6 @@ class MarketplaceViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    private var currentQuery = "topic:ouxy-module"
-
     init {
         loadModules()
     }
@@ -31,7 +32,7 @@ class MarketplaceViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _loading.value = true
-                val modules = marketplaceRepository.searchModules(currentQuery)
+                val modules = marketplaceRepository.searchModules()
                 _marketplaceModules.value = modules
                 _error.value = null
             } catch (e: Exception) {

@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.damolks.ouxy.databinding.FragmentTechnicianSetupBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TechnicianSetupFragment : Fragment() {
 
     private var _binding: FragmentTechnicianSetupBinding? = null
