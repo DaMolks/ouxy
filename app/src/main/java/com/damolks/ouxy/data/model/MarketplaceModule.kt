@@ -9,6 +9,5 @@ data class MarketplaceModule(
     val minAppVersion: String,
     val stars: Int,
     val repoUrl: String,
-    val screenshotUrls: List<String> = emptyList(),
-    val downloadCount: Int = 0
+    val screenshotUrls: List<String>
 )
