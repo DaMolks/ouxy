@@ -12,25 +12,27 @@ import com.damolks.ouxy.module.OuxyModule
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okio.buffer
-import okio.sink
 import org.json.JSONObject
-import java.io.File
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Singleton
 class ModuleInstallService @Inject constructor(
     @ApplicationContext private val context: Context,
     private val gitHubApi: GitHubApi,
-    private val moduleDao: ModuleDao
+    private val moduleDao: ModuleDao,
+    private val storageProvider: Provider<ModuleStorageApi>
 ) {
     private val loadedModules = mutableMapOf<String, OuxyModule>()
     private val moduleClassLoaders = mutableMapOf<String, ModuleClassLoader>()
 
     suspend fun installModule(module: MarketplaceModule) {
         withContext(Dispatchers.IO) {
-            val moduleDir = prepareModuleDirectory(module.id)
+            val moduleDir = context.getDir("modules", Context.MODE_PRIVATE)
+                .resolve(module.id)
+                .apply { mkdirs() }
+
             val manifest = downloadManifest(module, moduleDir)
             val moduleFile = downloadModuleJar(module, moduleDir, manifest)
             
@@ -48,27 +50,24 @@ class ModuleInstallService @Inject constructor(
         }
     }
 
-    private fun prepareModuleDirectory(moduleId: String) = 
-        context.getDir("modules", Context.MODE_PRIVATE)
-            .resolve(moduleId)
-            .apply { mkdirs() }
-
-    private suspend fun downloadManifest(module: MarketplaceModule, moduleDir: File): JSONObject {
-        val manifestFile = moduleDir.resolve("manifest.json")
+    private suspend fun downloadManifest(module: MarketplaceModule, moduleDir: java.io.File): JSONObject {
         val manifestContent = gitHubApi.getFileContents(
             owner = module.author,
             repo = module.id,
             path = "ouxy-module.json"
         )["content"] as String
-        manifestFile.writeText(manifestContent)
+        
+        moduleDir.resolve("manifest.json").writeText(manifestContent)
         return JSONObject(manifestContent)
     }
 
-    private suspend fun downloadModuleJar(module: MarketplaceModule, moduleDir: File, manifest: JSONObject): File {
-        // Récupérer l'URL du JAR depuis le manifest
+    private suspend fun downloadModuleJar(
+        module: MarketplaceModule,
+        moduleDir: java.io.File,
+        manifest: JSONObject
+    ): java.io.File {
         val jarPath = manifest.optString("jarPath", "module/build/module.jar")
         
-        // Récupérer d'abord le contenu du fichier pour avoir l'URL de téléchargement
         val jarInfo = gitHubApi.getFileContents(
             owner = module.author,
             repo = module.id,
@@ -78,20 +77,22 @@ class ModuleInstallService @Inject constructor(
         val downloadUrl = jarInfo["download_url"] as? String
             ?: throw IllegalStateException("URL de téléchargement non trouvée pour le JAR")
 
-        // Créer le fichier de destination
         val moduleFile = moduleDir.resolve("module.jar")
         
-        // Télécharger et sauvegarder le JAR
         gitHubApi.downloadFile(downloadUrl).use { body ->
-            moduleFile.sink().buffer().use { sink ->
-                sink.writeAll(body.source())
+            moduleFile.outputStream().use { output ->
+                body.byteStream().copyTo(output)
             }
         }
         
         return moduleFile
     }
     
-    private fun loadModule(moduleId: String, moduleFile: File, manifest: JSONObject): OuxyModule {
+    private fun loadModule(
+        moduleId: String,
+        moduleFile: java.io.File,
+        manifest: JSONObject
+    ): OuxyModule {
         val classLoader = ModuleClassLoader(moduleFile, javaClass.classLoader!!)
         moduleClassLoaders[moduleId] = classLoader
         
@@ -102,7 +103,7 @@ class ModuleInstallService @Inject constructor(
         val moduleContext = DefaultModuleContext(
             context = context,
             moduleId = moduleId,
-            moduleStorage = ModuleStorageApi(context, moduleId)
+            moduleStorage = storageProvider.get()
         )
         
         moduleInstance.initialize(moduleContext)
@@ -113,18 +114,15 @@ class ModuleInstallService @Inject constructor(
 
     suspend fun uninstallModule(moduleId: String) {
         withContext(Dispatchers.IO) {
-            // Nettoyage du module chargé
             loadedModules[moduleId]?.cleanup()
             loadedModules.remove(moduleId)
             moduleClassLoaders[moduleId]?.cleanup()
             moduleClassLoaders.remove(moduleId)
 
-            // Suppression des fichiers
             val moduleDir = context.getDir("modules", Context.MODE_PRIVATE)
                 .resolve(moduleId)
             moduleDir.deleteRecursively()
 
-            // Suppression de la base de données
             moduleDao.deleteModuleById(moduleId)
         }
     }
