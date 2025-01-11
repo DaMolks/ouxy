@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1E88E5</color>
-    <color name="colorPrimaryVariant">#005CB2</color>
-    <color name="colorSecondary">#00B8D4</color>
-    <color name="colorSecondaryVariant">#0088A3</color>
+    <!-- Base colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Theme colors -->
+    <color name="space_primary">#1E88E5</color>
+    <color name="space_primary_variant">#005CB2</color>
+    <color name="space_accent">#00B8D4</color>
+    <color name="space_accent_dark">#0088A3</color>
+    <color name="space_background">#F5F5F5</color>
     
     <!-- Module states -->
     <color name="moduleInstalled">#00C853</color>
