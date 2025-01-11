@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.damolks.ouxy.databinding.FragmentMarketplaceBinding
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,6 +37,16 @@ class MarketplaceFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener {
             requireActivity().onBackPressed()
         }
+        
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                com.damolks.ouxy.R.id.action_refresh -> {
+                    viewModel.refreshModules()
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -48,6 +59,8 @@ class MarketplaceFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.marketplaceModules.observe(viewLifecycleOwner) { modules ->
             modulesAdapter.submitList(modules)
+            binding.emptyView.visibility = if (modules.isEmpty()) View.VISIBLE else View.GONE
+            binding.recyclerView.visibility = if (modules.isEmpty()) View.GONE else View.VISIBLE
         }
 
         viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
@@ -56,7 +69,7 @@ class MarketplaceFragment : Fragment() {
 
         viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
             errorMessage?.let {
-                // TODO: Afficher l'erreur
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
             }
         }
     }
