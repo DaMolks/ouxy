@@ -7,4 +7,18 @@
     <string name="module_version">v%s</string>
     <string name="install">Installer</string>
     <string name="uninstall">Désinstaller</string>
+    
+    <!-- Dashboard menu -->
+    <string name="sites">Sites</string>
+    <string name="marketplace">Marketplace</string>
+    <string name="settings">Paramètres</string>
+    
+    <!-- Technician setup -->
+    <string name="setup_title">Configuration du profil technicien</string>
+    <string name="first_name">Prénom</string>
+    <string name="last_name">Nom</string>
+    <string name="sector">Secteur</string>
+    <string name="identifier">Identifiant</string>
+    <string name="supervisor">Chef</string>
+    <string name="save">Enregistrer</string>
 </resources>
