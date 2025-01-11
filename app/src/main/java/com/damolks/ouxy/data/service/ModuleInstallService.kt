@@ -12,7 +12,10 @@ import com.damolks.ouxy.module.OuxyModule
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okio.buffer
+import okio.sink
 import org.json.JSONObject
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -62,11 +65,28 @@ class ModuleInstallService @Inject constructor(
     }
 
     private suspend fun downloadModuleJar(module: MarketplaceModule, moduleDir: File, manifest: JSONObject): File {
-        // Créer le fichier JAR de destination
+        // Récupérer l'URL du JAR depuis le manifest
+        val jarPath = manifest.optString("jarPath", "module/build/module.jar")
+        
+        // Récupérer d'abord le contenu du fichier pour avoir l'URL de téléchargement
+        val jarInfo = gitHubApi.getFileContents(
+            owner = module.author,
+            repo = module.id,
+            path = jarPath
+        )
+        
+        val downloadUrl = jarInfo["download_url"] as? String
+            ?: throw IllegalStateException("URL de téléchargement non trouvée pour le JAR")
+
+        // Créer le fichier de destination
         val moduleFile = moduleDir.resolve("module.jar")
         
-        // TODO: Télécharger le JAR depuis GitHub
-        // Cette partie nécessitera probablement l'ajout d'une nouvelle méthode à GitHubApi
+        // Télécharger et sauvegarder le JAR
+        gitHubApi.downloadFile(downloadUrl).use { body ->
+            moduleFile.sink().buffer().use { sink ->
+                sink.writeAll(body.source())
+            }
+        }
         
         return moduleFile
     }
