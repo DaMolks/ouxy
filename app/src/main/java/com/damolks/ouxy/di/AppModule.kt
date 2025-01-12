@@ -1,12 +1,8 @@
 package com.damolks.ouxy.di
 
 import android.content.Context
-import androidx.room.Room
 import com.damolks.ouxy.data.api.GitHubApi
 import com.damolks.ouxy.data.api.ModuleStorageApi
-import com.damolks.ouxy.data.dao.ModuleDao
-import com.damolks.ouxy.data.dao.TechnicianDao
-import com.damolks.ouxy.data.database.AppDatabase
 import com.damolks.ouxy.data.repository.MarketplaceRepository
 import dagger.Module
 import dagger.Provides
@@ -27,28 +23,6 @@ annotation class ModuleId
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "ouxy_database"
-        ).build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideTechnicianDao(database: AppDatabase): TechnicianDao {
-        return database.technicianDao()
-    }
-
-    @Provides
-    @Singleton
-    fun provideModuleDao(database: AppDatabase): ModuleDao {
-        return database.moduleDao()
-    }
 
     @Provides
     @Singleton
