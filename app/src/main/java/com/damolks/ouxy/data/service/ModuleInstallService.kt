@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.io.File
+import java.util.jar.JarInputStream
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Singleton
@@ -46,12 +47,20 @@ class ModuleInstallService @Inject constructor(
                 // Télécharger et installer le JAR
                 val jarFile = downloadModuleJar(module, manifest)
 
+                // Inspecter le contenu du JAR
+                Log.d("ModuleInstall", "Inspection du contenu du JAR")
+                inspectJarContent(jarFile)
+
                 // S'assurer que le JAR final est en lecture seule
                 val finalJarFile = File(moduleDir, "module.jar")
                 jarFile.copyTo(finalJarFile, overwrite = true)
                 finalJarFile.setReadOnly()
 
                 Log.d("ModuleInstall", "JAR installé: ${finalJarFile.absolutePath}")
+
+                // Vérifier le contenu du JAR final
+                Log.d("ModuleInstall", "Inspection du JAR final")
+                inspectJarContent(finalJarFile)
 
                 // Charger et initialiser le module
                 loadedModules[module.id] = loadModule(module.id, finalJarFile, manifest)
@@ -74,6 +83,24 @@ class ModuleInstallService @Inject constructor(
                 Log.e("ModuleInstall", "Erreur lors de l'installation", e)
                 throw e
             }
+        }
+    }
+
+    private fun inspectJarContent(jarFile: File) {
+        try {
+            val entries = mutableListOf<String>()
+            jarFile.inputStream().use { input ->
+                JarInputStream(input).use { jarInputStream ->
+                    var entry = jarInputStream.nextJarEntry
+                    while (entry != null) {
+                        entries.add("${entry.name} (${entry.size} bytes)")
+                        entry = jarInputStream.nextJarEntry
+                    }
+                }
+            }
+            Log.d("ModuleInstall", "Contenu du JAR ${jarFile.name}:\n${entries.joinToString("\n")}")
+        } catch (e: Exception) {
+            Log.e("ModuleInstall", "Erreur lors de l'inspection du JAR", e)
         }
     }
 
@@ -125,7 +152,8 @@ class ModuleInstallService @Inject constructor(
             try {
                 gitHubApi.downloadFile(downloadUrl).use { body ->
                     tempFile.outputStream().use { output ->
-                        body.byteStream().copyTo(output)
+                        val copied = body.byteStream().copyTo(output)
+                        Log.d("ModuleInstall", "Taille du JAR téléchargé: $copied bytes")
                     }
                 }
 
