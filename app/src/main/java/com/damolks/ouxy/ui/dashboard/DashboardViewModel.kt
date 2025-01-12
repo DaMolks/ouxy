@@ -26,7 +26,13 @@ class DashboardViewModel @Inject constructor() : ViewModel() {
 
     fun addDynamicModules(modules: List<Module>) {
         val currentModules = _modules.value?.toMutableList() ?: mutableListOf()
-        currentModules.addAll(modules)
+        
+        // Éviter les doublons
+        val uniqueModules = modules.filterNot { newModule ->
+            currentModules.any { it.id == newModule.id }
+        }
+
+        currentModules.addAll(uniqueModules)
         _modules.value = currentModules
     }
 }
