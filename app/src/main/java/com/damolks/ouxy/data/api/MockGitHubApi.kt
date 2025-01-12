@@ -1,8 +1,11 @@
 package com.damolks.ouxy.data.api
 
+import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
+
 class MockGitHubApi : GitHubApi {
     override suspend fun searchRepositories(query: String): Map<String, Any> {
-        // Simulate a basic GitHub search response
+        // Simuler une réponse GitHub basique
         return mapOf(
             "items" to listOf(
                 mapOf(
@@ -16,13 +19,14 @@ class MockGitHubApi : GitHubApi {
     }
 
     override suspend fun getFileContents(owner: String, repo: String, path: String): Map<String, Any> {
-        // Simulate a basic manifest file response
+        // Simuler une réponse de manifest basique
         val manifest = """
             {
                 "name": "Test Module",
                 "description": "A test module for development",
                 "version": "1.0.0",
                 "minAppVersion": "1.0.0",
+                "entry": "com.example.TestModule",
                 "screenshots": []
             }
         """.trimIndent()
@@ -33,5 +37,10 @@ class MockGitHubApi : GitHubApi {
                 android.util.Base64.NO_WRAP
             )
         )
+    }
+
+    override suspend fun downloadFile(url: String): ResponseBody {
+        // Retourner un fichier JAR fictif vide
+        return ByteArray(0).toResponseBody(null)
     }
 }
