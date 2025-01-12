@@ -34,23 +34,29 @@ class ModuleInstallService @Inject constructor(
             try {
                 Log.d("ModuleInstall", "Début de l'installation du module: ${module.id}")
 
-                val manifest = downloadManifest(module)
-                Log.d("ModuleInstall", "Manifest téléchargé: ${manifest.toString(2)}")
+                // Créer le dossier de modules si nécessaire
+                val modulesDir = context.getDir("modules", Context.MODE_PRIVATE)
+                val moduleDir = File(modulesDir, module.id).apply { mkdirs() }
 
+                // Télécharger et sauvegarder le manifest
+                val manifest = downloadManifest(module)
+                File(moduleDir, "manifest.json").writeText(manifest.toString())
+                Log.d("ModuleInstall", "Manifest téléchargé et sauvegardé")
+
+                // Télécharger et installer le JAR
                 val jarFile = downloadModuleJar(module, manifest)
-                Log.d("ModuleInstall", "JAR téléchargé: ${jarFile.absolutePath}, taille: ${jarFile.length()}")
+
+                // S'assurer que le JAR final est en lecture seule
+                val finalJarFile = File(moduleDir, "module.jar")
+                jarFile.copyTo(finalJarFile, overwrite = true)
+                finalJarFile.setReadOnly()
+
+                Log.d("ModuleInstall", "JAR installé: ${finalJarFile.absolutePath}")
 
                 // Charger et initialiser le module
-                Log.d("ModuleInstall", "Chargement et initialisation du module")
-                loadedModules[module.id] = loadModule(module.id, jarFile, manifest)
+                loadedModules[module.id] = loadModule(module.id, finalJarFile, manifest)
 
-                // Déplacer vers l'emplacement final
-                val modulesDir = context.getDir("modules", Context.MODE_PRIVATE)
-                val finalDir = File(modulesDir, module.id).apply { mkdirs() }
-                val finalJar = File(finalDir, "module.jar")
-                jarFile.copyTo(finalJar, overwrite = true)
-
-                Log.d("ModuleInstall", "Enregistrement dans la base de données")
+                // Enregistrer dans la base de données
                 val installedModule = InstalledModule(
                     id = module.id,
                     name = module.name,
@@ -59,7 +65,7 @@ class ModuleInstallService @Inject constructor(
                 )
                 moduleDao.insertModule(installedModule)
 
-                // Nettoyer le fichier temporaire
+                // Nettoyer les fichiers temporaires
                 jarFile.delete()
 
                 Log.d("ModuleInstall", "Installation terminée avec succès")
@@ -114,21 +120,24 @@ class ModuleInstallService @Inject constructor(
 
             Log.d("ModuleInstall", "Téléchargement depuis: $downloadUrl")
 
-            // Créer un fichier temporaire
-            val tempFile = File.createTempFile("module", ".jar", context.cacheDir)
-
-            // Télécharger le contenu
-            gitHubApi.downloadFile(downloadUrl).use { body ->
-                tempFile.outputStream().use { output ->
-                    body.byteStream().copyTo(output)
+            // Utiliser un fichier temporaire pour le téléchargement
+            val tempFile = File.createTempFile("module_dl_", ".jar", context.cacheDir)
+            try {
+                gitHubApi.downloadFile(downloadUrl).use { body ->
+                    tempFile.outputStream().use { output ->
+                        body.byteStream().copyTo(output)
+                    }
                 }
-            }
 
-            if (!tempFile.exists() || tempFile.length() == 0L) {
-                throw IllegalStateException("Le JAR n'a pas été téléchargé correctement")
-            }
+                if (!tempFile.exists() || tempFile.length() == 0L) {
+                    throw IllegalStateException("Le JAR n'a pas été téléchargé correctement")
+                }
 
-            tempFile
+                tempFile
+            } catch (e: Exception) {
+                tempFile.delete() // Nettoyer en cas d'erreur
+                throw e
+            }
 
         } catch (e: Exception) {
             Log.e("ModuleInstall", "Erreur lors du téléchargement du JAR", e)
@@ -142,7 +151,15 @@ class ModuleInstallService @Inject constructor(
         manifest: JSONObject
     ): OuxyModule {
         return try {
-            Log.d("ModuleInstall", "Création du ClassLoader")
+            if (!moduleFile.exists()) {
+                throw IllegalStateException("Le fichier du module n'existe pas: ${moduleFile.absolutePath}")
+            }
+
+            if (moduleFile.canWrite()) {
+                throw SecurityException("Le fichier du module doit être en lecture seule")
+            }
+
+            Log.d("ModuleInstall", "Création du ClassLoader pour ${moduleFile.absolutePath}")
             val classLoader = ModuleClassLoader(moduleFile, javaClass.classLoader!!)
             moduleClassLoaders[moduleId] = classLoader
 
