@@ -89,4 +89,10 @@ object AppModule {
     ): ModuleStorageApi {
         return ModuleStorageApi(context, moduleId)
     }
+
+    @Provides
+    @Singleton
+    fun provideMarketplaceRepository(gitHubApi: GitHubApi): MarketplaceRepository {
+        return MarketplaceRepository(gitHubApi)
+    }
 }
