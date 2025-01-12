@@ -14,6 +14,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Provider
 import javax.inject.Singleton
@@ -33,21 +34,28 @@ class ModuleInstallService @Inject constructor(
             try {
                 Log.d("ModuleInstall", "Début de l'installation du module: ${module.id}")
                 
-                val moduleDir = context.getDir("modules", Context.MODE_PRIVATE)
-                    .resolve(module.id)
-                    .apply { mkdirs() }
+                // Créer le répertoire des modules
+                val modulesDir = context.getDir("modules", Context.MODE_PRIVATE)
+                val moduleDir = File(modulesDir, module.id).apply { mkdirs() }
                 Log.d("ModuleInstall", "Répertoire créé: ${moduleDir.absolutePath}")
+
+                // Créer un répertoire en lecture seule pour les JARs
+                val libsDir = File(modulesDir, "libs").apply { mkdirs() }
+                libsDir.setReadOnly()
 
                 val manifest = downloadManifest(module, moduleDir)
                 Log.d("ModuleInstall", "Manifest téléchargé: ${manifest.toString(2)}")
                 
-                val moduleFile = downloadModuleJar(module, moduleDir, manifest)
+                val moduleFile = downloadModuleJar(module, libsDir, manifest)
                 Log.d("ModuleInstall", "JAR téléchargé: ${moduleFile.absolutePath}, taille: ${moduleFile.length()}")
                 
-                Log.d("ModuleInstall", "Chargement du module")
+                // S'assurer que le JAR est en lecture seule
+                moduleFile.setReadOnly()
+                
+                Log.d("ModuleInstall", "Chargement et initialisation du module")
                 loadedModules[module.id] = loadModule(module.id, moduleFile, manifest)
                 
-                Log.d("ModuleInstall", "Enregistrement en base de données")
+                Log.d("ModuleInstall", "Enregistrement dans la base de données")
                 val installedModule = InstalledModule(
                     id = module.id,
                     name = module.name,
@@ -55,6 +63,7 @@ class ModuleInstallService @Inject constructor(
                     author = module.author
                 )
                 moduleDao.insertModule(installedModule)
+                
                 Log.d("ModuleInstall", "Installation terminée avec succès")
                 
             } catch (e: Exception) {
@@ -64,7 +73,7 @@ class ModuleInstallService @Inject constructor(
         }
     }
 
-    private suspend fun downloadManifest(module: MarketplaceModule, moduleDir: java.io.File): JSONObject {
+    private suspend fun downloadManifest(module: MarketplaceModule, moduleDir: File): JSONObject {
         return try {
             Log.d("ModuleInstall", "Téléchargement du manifest depuis GitHub")
             val response = gitHubApi.getFileContents(
@@ -92,9 +101,9 @@ class ModuleInstallService @Inject constructor(
 
     private suspend fun downloadModuleJar(
         module: MarketplaceModule,
-        moduleDir: java.io.File,
+        libsDir: File,
         manifest: JSONObject
-    ): java.io.File {
+    ): File {
         return try {
             val jarPath = manifest.getString("jarPath")
             Log.d("ModuleInstall", "Chemin du JAR: $jarPath")
@@ -110,18 +119,28 @@ class ModuleInstallService @Inject constructor(
 
             Log.d("ModuleInstall", "Téléchargement depuis: $downloadUrl")
             
-            val moduleFile = moduleDir.resolve("module.jar")
+            // Télécharger dans un fichier temporaire d'abord
+            val tempFile = File.createTempFile("module", ".jar", context.cacheDir)
             gitHubApi.downloadFile(downloadUrl).use { body ->
-                moduleFile.outputStream().use { output ->
+                tempFile.outputStream().use { output ->
                     body.byteStream().copyTo(output)
                 }
             }
             
-            if (!moduleFile.exists() || moduleFile.length() == 0L) {
+            // Vérifier que le téléchargement est ok
+            if (!tempFile.exists() || tempFile.length() == 0L) {
                 throw IllegalStateException("Le JAR n'a pas été téléchargé correctement")
             }
             
-            moduleFile
+            // Copier vers le répertoire final en lecture seule
+            val finalJar = File(libsDir, "${module.id}.jar")
+            tempFile.copyTo(finalJar, overwrite = true)
+            finalJar.setReadOnly()
+            
+            // Nettoyer le fichier temporaire
+            tempFile.delete()
+            
+            finalJar
             
         } catch (e: Exception) {
             Log.e("ModuleInstall", "Erreur lors du téléchargement du JAR", e)
@@ -131,7 +150,7 @@ class ModuleInstallService @Inject constructor(
     
     private fun loadModule(
         moduleId: String,
-        moduleFile: java.io.File,
+        moduleFile: File,
         manifest: JSONObject
     ): OuxyModule {
         return try {
@@ -163,15 +182,18 @@ class ModuleInstallService @Inject constructor(
 
     suspend fun uninstallModule(moduleId: String) {
         withContext(Dispatchers.IO) {
+            // Nettoyage du module
             loadedModules[moduleId]?.cleanup()
             loadedModules.remove(moduleId)
             moduleClassLoaders[moduleId]?.cleanup()
             moduleClassLoaders.remove(moduleId)
 
-            val moduleDir = context.getDir("modules", Context.MODE_PRIVATE)
-                .resolve(moduleId)
-            moduleDir.deleteRecursively()
+            // Supprimer les fichiers
+            val modulesDir = context.getDir("modules", Context.MODE_PRIVATE)
+            File(modulesDir, moduleId).deleteRecursively()
+            File(modulesDir, "libs/${moduleId}.jar").delete()
 
+            // Supprimer de la base de données
             moduleDao.deleteModuleById(moduleId)
         }
     }
