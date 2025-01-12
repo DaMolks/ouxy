@@ -13,7 +13,7 @@ class DashboardViewModel @Inject constructor() : ViewModel() {
     val modules: LiveData<List<Module>> = _modules
 
     init {
-        // TODO: Load installed modules
+        // Module par défaut
         _modules.value = listOf(
             Module(
                 id = "reports",
@@ -22,5 +22,11 @@ class DashboardViewModel @Inject constructor() : ViewModel() {
                 iconResId = android.R.drawable.ic_menu_edit
             )
         )
+    }
+
+    fun addDynamicModules(modules: List<Module>) {
+        val currentModules = _modules.value?.toMutableList() ?: mutableListOf()
+        currentModules.addAll(modules)
+        _modules.value = currentModules
     }
 }
