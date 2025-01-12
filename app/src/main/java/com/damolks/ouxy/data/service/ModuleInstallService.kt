@@ -33,11 +33,12 @@ class ModuleInstallService @Inject constructor(
                 .resolve(module.id)
                 .apply { mkdirs() }
 
+            // Télécharger le manifest et le module
             val manifest = downloadManifest(module, moduleDir)
             val moduleFile = downloadModuleJar(module, moduleDir, manifest)
             
             // Charger et initialiser le module
-            val moduleInstance = loadModule(module.id, moduleFile, manifest)
+            loadedModules[module.id] = loadModule(module.id, moduleFile, manifest)
             
             // Enregistrer dans la base de données
             val installedModule = InstalledModule(
@@ -107,8 +108,6 @@ class ModuleInstallService @Inject constructor(
         )
         
         moduleInstance.initialize(moduleContext)
-        loadedModules[moduleId] = moduleInstance
-        
         return moduleInstance
     }
 
