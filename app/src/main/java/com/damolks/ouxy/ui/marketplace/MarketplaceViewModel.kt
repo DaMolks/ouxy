@@ -1,5 +1,6 @@
 package com.damolks.ouxy.ui.marketplace
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -44,7 +45,6 @@ class MarketplaceViewModel @Inject constructor(
                 val modules = marketplaceRepository.searchModules()
                 _marketplaceModules.postValue(modules)
                 
-                // Vérifier l'état d'installation de chaque module
                 val states = modules.associate { module ->
                     module.id to moduleInstallService.isModuleInstalled(module.id)
                 }
@@ -66,14 +66,22 @@ class MarketplaceViewModel @Inject constructor(
     fun installModule(module: MarketplaceModule) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                Log.d("ModuleInstall", "Début de l'installation du module: ${module.id}")
                 _loading.postValue(true)
-                moduleInstallService.installModule(module)
+                
+                Log.d("ModuleInstall", "Téléchargement du manifest")
+                val manifestResult = moduleInstallService.installModule(module)
+                
+                Log.d("ModuleInstall", "Mise à jour des états de module")
                 _moduleInstallStates.update { states ->
                     states + (module.id to true)
                 }
+                
+                Log.d("ModuleInstall", "Module installé avec succès")
                 _error.postValue("Module ${module.name} installé avec succès")
             } catch (e: Exception) {
-                _error.postValue("Erreur lors de l'installation: ${e.message}")
+                Log.e("ModuleInstall", "Erreur lors de l'installation", e)
+                _error.postValue("Erreur lors de l'installation: ${e.localizedMessage}")
             } finally {
                 _loading.postValue(false)
             }

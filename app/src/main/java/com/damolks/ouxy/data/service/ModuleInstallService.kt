@@ -1,6 +1,7 @@
 package com.damolks.ouxy.data.service
 
 import android.content.Context
+import android.util.Log
 import com.damolks.ouxy.data.api.GitHubApi
 import com.damolks.ouxy.data.api.ModuleStorageApi
 import com.damolks.ouxy.data.dao.ModuleDao
@@ -29,18 +30,21 @@ class ModuleInstallService @Inject constructor(
 
     suspend fun installModule(module: MarketplaceModule) {
         withContext(Dispatchers.IO) {
+            Log.d("ModuleInstall", "Création du répertoire du module: ${module.id}")
             val moduleDir = context.getDir("modules", Context.MODE_PRIVATE)
                 .resolve(module.id)
                 .apply { mkdirs() }
 
-            // Télécharger le manifest et le module
+            Log.d("ModuleInstall", "Téléchargement du manifest")
             val manifest = downloadManifest(module, moduleDir)
+            
+            Log.d("ModuleInstall", "Téléchargement du JAR module")
             val moduleFile = downloadModuleJar(module, moduleDir, manifest)
             
-            // Charger et initialiser le module
+            Log.d("ModuleInstall", "Chargement et initialisation du module")
             loadedModules[module.id] = loadModule(module.id, moduleFile, manifest)
             
-            // Enregistrer dans la base de données
+            Log.d("ModuleInstall", "Enregistrement dans la base de données")
             val installedModule = InstalledModule(
                 id = module.id,
                 name = module.name,
@@ -52,6 +56,7 @@ class ModuleInstallService @Inject constructor(
     }
 
     private suspend fun downloadManifest(module: MarketplaceModule, moduleDir: java.io.File): JSONObject {
+        Log.d("ModuleInstall", "Récupération du manifest pour ${module.id}")
         val manifestContent = gitHubApi.getFileContents(
             owner = module.author,
             repo = module.id,
@@ -69,6 +74,8 @@ class ModuleInstallService @Inject constructor(
     ): java.io.File {
         val jarPath = manifest.optString("jarPath", "module/build/module.jar")
         
+        Log.d("ModuleInstall", "Récupération du JAR : $jarPath")
+        
         val jarInfo = gitHubApi.getFileContents(
             owner = module.author,
             repo = module.id,
@@ -79,6 +86,8 @@ class ModuleInstallService @Inject constructor(
             ?: throw IllegalStateException("URL de téléchargement non trouvée pour le JAR")
 
         val moduleFile = moduleDir.resolve("module.jar")
+        
+        Log.d("ModuleInstall", "Téléchargement du JAR depuis $downloadUrl")
         
         gitHubApi.downloadFile(downloadUrl).use { body ->
             moduleFile.outputStream().use { output ->
@@ -100,7 +109,6 @@ class ModuleInstallService @Inject constructor(
         val moduleClass = manifest.getString("entry")
         val moduleInstance = classLoader.loadModuleClass(moduleClass)
         
-        // Créer et initialiser le contexte du module
         val moduleContext = DefaultModuleContext(
             context = context,
             moduleId = moduleId,
