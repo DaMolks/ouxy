@@ -34,31 +34,21 @@ class ModuleInstallService @Inject constructor(
             try {
                 Log.d("ModuleInstall", "Début de l'installation du module: ${module.id}")
 
-                // Créer le dossier du module dans le cache temporaire
-                val cacheDir = context.cacheDir
-                val tempDir = File(cacheDir, "module_temp")
-                tempDir.mkdirs()
-                Log.d("ModuleInstall", "Répertoire temporaire créé: ${tempDir.absolutePath}")
-
-                val manifest = downloadManifest(module, tempDir)
+                val manifest = downloadManifest(module)
                 Log.d("ModuleInstall", "Manifest téléchargé: ${manifest.toString(2)}")
 
-                val moduleFile = downloadModuleJar(module, tempDir, manifest)
-                Log.d("ModuleInstall", "JAR téléchargé: ${moduleFile.absolutePath}, taille: ${moduleFile.length()}")
-
-                // Vérifier que le JAR est accessible en lecture seule
-                moduleFile.setReadOnly()
-                Log.d("ModuleInstall", "JAR configuré en lecture seule")
+                val jarFile = downloadModuleJar(module, manifest)
+                Log.d("ModuleInstall", "JAR téléchargé: ${jarFile.absolutePath}, taille: ${jarFile.length()}")
 
                 // Charger et initialiser le module
                 Log.d("ModuleInstall", "Chargement et initialisation du module")
-                loadedModules[module.id] = loadModule(module.id, moduleFile, manifest)
+                loadedModules[module.id] = loadModule(module.id, jarFile, manifest)
 
                 // Déplacer vers l'emplacement final
                 val modulesDir = context.getDir("modules", Context.MODE_PRIVATE)
-                val finalDir = File(modulesDir, module.id)
-                finalDir.mkdirs()
-                moduleFile.renameTo(File(finalDir, "module.jar"))
+                val finalDir = File(modulesDir, module.id).apply { mkdirs() }
+                val finalJar = File(finalDir, "module.jar")
+                jarFile.copyTo(finalJar, overwrite = true)
 
                 Log.d("ModuleInstall", "Enregistrement dans la base de données")
                 val installedModule = InstalledModule(
@@ -69,8 +59,8 @@ class ModuleInstallService @Inject constructor(
                 )
                 moduleDao.insertModule(installedModule)
 
-                // Nettoyer le répertoire temporaire
-                tempDir.deleteRecursively()
+                // Nettoyer le fichier temporaire
+                jarFile.delete()
 
                 Log.d("ModuleInstall", "Installation terminée avec succès")
 
@@ -81,7 +71,7 @@ class ModuleInstallService @Inject constructor(
         }
     }
 
-    private suspend fun downloadManifest(module: MarketplaceModule, moduleDir: File): JSONObject {
+    private suspend fun downloadManifest(module: MarketplaceModule): JSONObject {
         return try {
             Log.d("ModuleInstall", "Téléchargement du manifest depuis GitHub")
             val response = gitHubApi.getFileContents(
@@ -97,8 +87,6 @@ class ModuleInstallService @Inject constructor(
                 .toString(Charsets.UTF_8)
 
             Log.d("ModuleInstall", "Manifest décodé: $decodedContent")
-
-            moduleDir.resolve("manifest.json").writeText(decodedContent)
             JSONObject(decodedContent)
 
         } catch (e: Exception) {
@@ -109,7 +97,6 @@ class ModuleInstallService @Inject constructor(
 
     private suspend fun downloadModuleJar(
         module: MarketplaceModule,
-        moduleDir: File,
         manifest: JSONObject
     ): File {
         return try {
@@ -127,18 +114,21 @@ class ModuleInstallService @Inject constructor(
 
             Log.d("ModuleInstall", "Téléchargement depuis: $downloadUrl")
 
-            val jarFile = File(moduleDir, "module.jar")
+            // Créer un fichier temporaire
+            val tempFile = File.createTempFile("module", ".jar", context.cacheDir)
+
+            // Télécharger le contenu
             gitHubApi.downloadFile(downloadUrl).use { body ->
-                jarFile.outputStream().use { output ->
+                tempFile.outputStream().use { output ->
                     body.byteStream().copyTo(output)
                 }
             }
 
-            if (!jarFile.exists() || jarFile.length() == 0L) {
+            if (!tempFile.exists() || tempFile.length() == 0L) {
                 throw IllegalStateException("Le JAR n'a pas été téléchargé correctement")
             }
 
-            jarFile
+            tempFile
 
         } catch (e: Exception) {
             Log.e("ModuleInstall", "Erreur lors du téléchargement du JAR", e)
