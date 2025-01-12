@@ -21,9 +21,9 @@ class ModuleStorageApi @Inject constructor(
                 is Int -> preferences[intPreferencesKey(key)] = value
                 is Long -> preferences[longPreferencesKey(key)] = value
                 is Float -> preferences[floatPreferencesKey(key)] = value
-                is Double -> preferences[doublePreferencesKey(key)] = value.toFloat()
+                is Double -> preferences[floatPreferencesKey(key)] = value.toFloat()
                 is Boolean -> preferences[booleanPreferencesKey(key)] = value
-                else -> throw IllegalArgumentException("Type non supporté: ${value?.javaClass?.simpleName}")
+                else -> throw IllegalArgumentException("Type non supporté: ${value?.let { it::class.java.simpleName }}")
             }
         }
     }
@@ -36,7 +36,7 @@ class ModuleStorageApi @Inject constructor(
             is Int -> preferences[intPreferencesKey(key)] as? T ?: defaultValue
             is Long -> preferences[longPreferencesKey(key)] as? T ?: defaultValue
             is Float -> preferences[floatPreferencesKey(key)] as? T ?: defaultValue
-            is Double -> (preferences[floatPreferencesKey(key)]?.toDouble()) as? T ?: defaultValue
+            is Double -> (preferences[floatPreferencesKey(key)]?.toDouble() as? T) ?: defaultValue
             is Boolean -> preferences[booleanPreferencesKey(key)] as? T ?: defaultValue
             else -> defaultValue
         }
