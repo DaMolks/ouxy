@@ -1,37 +1,46 @@
 package com.damolks.ouxy.module
 
 import android.content.Context
-import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleCoroutineScope
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
-/**
- * Implémentation par défaut du contexte fourni aux modules.
- */
-class DefaultModuleContext @Inject constructor(
-    @ApplicationContext override val applicationContext: Context,
-    private val moduleId: String,
-    override val storage: StorageApi,
-    override val lifecycleScope: LifecycleCoroutineScope
+class DefaultModuleContext(
+    override val applicationContext: Context,
+    override val lifecycleScope: LifecycleCoroutineScope,
+    override val storage: StorageApi
 ) : ModuleContext {
 
-    private val eventHandlers = mutableMapOf<String, (Map<String, Any>) -> Unit>()
-
+    private val eventHandlers = mutableMapOf<String, MutableList<(Map<String, Any>) -> Unit>>()
+    
     override fun hasPermission(permission: String): Boolean {
-        return applicationContext.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+        // TODO: Implémenter la vérification des permissions
+        return true
     }
-
-    override suspend fun requestPermission(permission: String): Boolean {
-        // TODO: Implémenter la demande de permission via l'activité
-        return hasPermission(permission)
+    
+    override suspend fun requestPermission(permission: String): Boolean = suspendCancellableCoroutine { continuation ->
+        MaterialAlertDialogBuilder(applicationContext)
+            .setTitle("Permission Required")
+            .setMessage("This module needs additional permissions to work properly.")
+            .setPositiveButton("Grant") { _, _ ->
+                // TODO: Implémenter la demande de permission
+                continuation.resume(true)
+            }
+            .setNegativeButton("Deny") { _, _ ->
+                continuation.resume(false)
+            }
+            .show()
     }
-
+    
     override fun sendEvent(name: String, data: Map<String, Any>) {
-        // TODO: Implémenter l'envoi d'événements entre modules
+        eventHandlers[name]?.forEach { handler ->
+            handler(data)
+        }
     }
 
     override fun registerEventHandler(name: String, handler: (Map<String, Any>) -> Unit) {
-        eventHandlers[name] = handler
+        val handlers = eventHandlers.getOrPut(name) { mutableListOf() }
+        handlers.add(handler)
     }
 }
