@@ -3,20 +3,18 @@ package com.damolks.ouxy.module
 import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.damolks.ouxy.data.api.StorageApi
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
+// Supprimé l'import de ModuleContext local pour utiliser celui du SDK
 
 class DefaultModuleContext(
     override val applicationContext: Context,
     override val lifecycleScope: LifecycleCoroutineScope,
     override val storage: StorageApi
-) : ModuleContext {
+) : com.damolks.ouxy.module.ModuleContext { // Import complet pour éviter l'ambiguïté
 
     private val eventHandlers = mutableMapOf<String, MutableList<(Map<String, Any>) -> Unit>>()
     
     override fun hasPermission(permission: String): Boolean {
-        // TODO: Implémenter la vérification des permissions
+        // TODO: Implémentation
         return true
     }
     
@@ -25,7 +23,7 @@ class DefaultModuleContext(
             .setTitle("Permission Required")
             .setMessage("This module needs additional permissions to work properly.")
             .setPositiveButton("Grant") { _, _ ->
-                // TODO: Implémenter la demande de permission
+                // TODO: Implémentation
                 continuation.resume(true)
             }
             .setNegativeButton("Deny") { _, _ ->
