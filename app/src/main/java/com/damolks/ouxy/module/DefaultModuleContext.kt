@@ -2,7 +2,7 @@ package com.damolks.ouxy.module
 
 import android.content.Context
 import android.content.pm.PackageManager
-import com.damolks.ouxy.data.api.StorageApi
+import androidx.lifecycle.LifecycleCoroutineScope
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -10,21 +10,28 @@ import javax.inject.Inject
  * Implémentation par défaut du contexte fourni aux modules.
  */
 class DefaultModuleContext @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ApplicationContext override val applicationContext: Context,
     private val moduleId: String,
-    private val moduleStorage: StorageApi
+    override val storage: StorageApi,
+    override val lifecycleScope: LifecycleCoroutineScope
 ) : ModuleContext {
 
-    override val applicationContext: Context = context
-
-    override val storage: StorageApi = moduleStorage
+    private val eventHandlers = mutableMapOf<String, (Map<String, Any>) -> Unit>()
 
     override fun hasPermission(permission: String): Boolean {
-        return context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+        return applicationContext.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
     }
 
     override suspend fun requestPermission(permission: String): Boolean {
         // TODO: Implémenter la demande de permission via l'activité
         return hasPermission(permission)
+    }
+
+    override fun sendEvent(name: String, data: Map<String, Any>) {
+        // TODO: Implémenter l'envoi d'événements entre modules
+    }
+
+    override fun registerEventHandler(name: String, handler: (Map<String, Any>) -> Unit) {
+        eventHandlers[name] = handler
     }
 }
